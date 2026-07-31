@@ -1,22 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'features/workout/presentation/screens/home_screen.dart';
+import 'features/workout/presentation/providers/workout_providers.dart';
 import 'core/database/database.dart';
-
-final databaseProvider = Provider<DatabaseService>((ref) {
-  return DatabaseService();
-});
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   final dbService = DatabaseService();
-  await dbService.openDB();
+  final isar = await dbService.openDB();
 
   runApp(
     ProviderScope(
       overrides: [
-        databaseProvider.overrideWithValue(dbService),
+        isarProvider.overrideWithValue(isar),
       ],
       child: const GymTrackerApp(),
     ),

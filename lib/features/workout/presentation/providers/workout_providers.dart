@@ -1,18 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isar/isar.dart';
 import '../../domain/models.dart';
+import '../../data/workout_repository.dart';
 
-// Placeholder provider para simular dados do banco
+final isarProvider = Provider<Isar>((ref) => throw UnimplementedError());
+
+final workoutRepositoryProvider = Provider<WorkoutRepository>((ref) {
+  final isar = ref.watch(isarProvider);
+  return WorkoutRepository(isar);
+});
+
 final workoutRoutinesProvider = FutureProvider<List<WorkoutRoutine>>((ref) async {
-  // Simulando uma busca no banco Isar
-  await Future.delayed(const Duration(milliseconds: 500));
-  
-  final routine1 = WorkoutRoutine()
-    ..name = 'Treino A - Peito e Tríceps'
-    ..daysOfWeek = [1, 4]; // Segunda e Quinta
-
-  final routine2 = WorkoutRoutine()
-    ..name = 'Treino B - Costas e Bíceps'
-    ..daysOfWeek = [2, 5]; // Terça e Sexta
-    
-  return [routine1, routine2];
+  final repository = ref.watch(workoutRepositoryProvider);
+  return repository.getAllRoutines();
 });

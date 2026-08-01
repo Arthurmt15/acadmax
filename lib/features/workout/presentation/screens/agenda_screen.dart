@@ -3,117 +3,437 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/workout_providers.dart';
 import 'active_workout_screen.dart';
 
-class AgendaScreen extends ConsumerWidget {
+final weekOffsetProvider = StateProvider<int>((ref) => 0);
+
+class AgendaScreen extends ConsumerStatefulWidget {
   const AgendaScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final routinesAsync = ref.watch(routinesForSelectedDayProvider);
-    final selectedDay = ref.watch(selectedDayProvider);
+  ConsumerState<AgendaScreen> createState() => _AgendaScreenState();
+}
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Agenda', style: TextStyle(fontWeight: FontWeight.bold)),
-      ),
-      body: Column(
-        children: [
-          _buildDaySelector(context, ref, selectedDay),
-          Expanded(
-            child: routinesAsync.when(
-              data: (routines) {
-                if (routines.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'Dia livre de treinos!\nVá na aba Treinos para criar ou editar algo.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.grey, fontSize: 16),
-                    ),
-                  );
-                }
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16.0),
-                  itemCount: routines.length,
-                  itemBuilder: (context, index) {
-                    final routine = routines[index];
-                    return Card(
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(16),
-                        title: Text(routine.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                        subtitle: Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text('${routine.exercises.length} exercícios'),
-                        ),
-                        trailing: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ActiveWorkoutScreen(routineName: routine.name),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Theme.of(context).colorScheme.primary,
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                          child: const Text('INICIAR', style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, stack) => Center(child: Text('Erro: $err')),
-            ),
-          ),
-        ],
-      ),
+class _AgendaScreenState extends ConsumerState<AgendaScreen> {
+  late final PageController _pageController;
+  static const int _centerPage = 5000;
+  double _dragStartX = 0;
+
+  void _goToPreviousWeek() {
+    _pageController.previousPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
     );
   }
 
-  Widget _buildDaySelector(BuildContext context, WidgetRef ref, int selectedDay) {
-    final days = [
-      {'label': 'Seg', 'value': 1},
-      {'label': 'Ter', 'value': 2},
-      {'label': 'Qua', 'value': 3},
-      {'label': 'Qui', 'value': 4},
-      {'label': 'Sex', 'value': 5},
-      {'label': 'Sáb', 'value': 6},
-      {'label': 'Dom', 'value': 7},
-    ];
+  void _goToNextWeek() {
+    _pageController.nextPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          children: days.map((day) {
-            final isSelected = selectedDay == day['value'];
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: ChoiceChip(
-                label: Text(
-                  day['label'] as String,
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _centerPage, viewportFraction: 1.0);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour >= 6 && hour < 12) return 'MORNING GRIND';
+    if (hour >= 12 && hour < 18) return 'AFTERNOON SHIFT';
+    return 'NIGHT OPERATION';
+  }
+
+  String _weekdayShort(int weekday) {
+    const s = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+    return s[weekday - 1];
+  }
+
+  String _monthShort(int month) {
+    const s = ['', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
+                'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    return s[month];
+  }
+
+  DateTime _getMondayOf(int weekOffset) {
+    final today = DateTime.now();
+    final midnight = DateTime(today.year, today.month, today.day);
+    final fromMonday = midnight.weekday - 1;
+    return midnight
+        .subtract(Duration(days: fromMonday))
+        .add(Duration(days: weekOffset * 7));
+  }
+
+  String _weekLabel(int offset, DateTime monday) {
+    final sunday = monday.add(const Duration(days: 6));
+    if (offset == 0) return 'CURRENT WEEK';
+    if (offset == -1) return 'PREVIOUS WEEK';
+    if (offset == 1) return 'NEXT WEEK';
+    if (monday.month == sunday.month) {
+      return '${monday.day}-${sunday.day} ${_monthShort(monday.month)}';
+    }
+    return '${monday.day} ${_monthShort(monday.month)} - ${sunday.day} ${_monthShort(sunday.month)}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final routinesAsync = ref.watch(workoutRoutinesProvider);
+    final sessionsAsync = ref.watch(workoutSessionsProvider);
+    final currentOffset = ref.watch(weekOffsetProvider);
+    final today = DateTime.now();
+    final todayMidnight = DateTime(today.year, today.month, today.day);
+    
+    // Brutalism Colors
+    final primary = Theme.of(context).colorScheme.primary;
+    const darkBg = Color(0xFF111111);
+    const lightBorder = Colors.white;
+
+    final workedOutDates = sessionsAsync.whenData((sessions) {
+      return sessions.map((s) {
+        final d = s.startTime;
+        return DateTime(d.year, d.month, d.day);
+      }).toSet();
+    }).valueOrNull ?? <DateTime>{};
+
+    final currentMonday = _getMondayOf(currentOffset);
+    final trainedThisWeek = List.generate(7, (i) => currentMonday.add(Duration(days: i)))
+        .where((d) => workedOutDates.contains(d))
+        .length;
+
+    return Scaffold(
+      backgroundColor: darkBg,
+      body: SafeArea(
+        child: GestureDetector(
+          onHorizontalDragStart: (details) {
+            _dragStartX = details.globalPosition.dx;
+          },
+          onHorizontalDragEnd: (details) {
+            final velocity = details.primaryVelocity ?? 0;
+            if (velocity > 200) {
+              _goToPreviousWeek();
+            } else if (velocity < -200) {
+              _goToNextWeek();
+            }
+          },
+          behavior: HitTestBehavior.translucent,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ─── HEADER ───────────────────────────────────────────────
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(20, 32, 20, 24),
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: lightBorder, width: 2)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _getGreeting(),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'OVERCOME.',
+                            style: TextStyle(
+                              fontSize: 48,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              height: 1.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: primary,
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            '$trainedThisWeek',
+                            style: const TextStyle(
+                              fontSize: 32,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              height: 1.0,
+                            ),
+                          ),
+                          const Text(
+                            'SESSIONS',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // ─── CARROSSEL DE SEMANAS ─────────────────────────────────
+              Container(
+                height: 160,
+                decoration: const BoxDecoration(
+                  border: Border(bottom: BorderSide(color: lightBorder, width: 2)),
+                ),
+                child: PageView.builder(
+                  controller: _pageController,
+                  physics: const BouncingScrollPhysics(),
+                  onPageChanged: (page) {
+                    ref.read(weekOffsetProvider.notifier).state = page - _centerPage;
+                  },
+                  itemBuilder: (context, page) {
+                    final offset = page - _centerPage;
+                    final monday = _getMondayOf(offset);
+                    final label = _weekLabel(offset, monday);
+                    final isCurrentWeek = offset == 0;
+
+                    return Container(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              GestureDetector(
+                                onTap: _goToPreviousWeek,
+                                child: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
+                              ),
+                              Text(
+                                label.toUpperCase(),
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: isCurrentWeek ? primary : Colors.grey.shade400,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: _goToNextWeek,
+                                child: const Icon(Icons.arrow_forward, color: Colors.white, size: 24),
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: List.generate(7, (i) {
+                              final day = monday.add(Duration(days: i));
+                              final isToday = day == todayMidnight;
+                              final didWorkout = workedOutDates.contains(day);
+                              final isPast = day.isBefore(todayMidnight);
+
+                              Color boxColor;
+                              Color textColor;
+                              Color borderColor;
+
+                              if (didWorkout) {
+                                boxColor = Colors.white;
+                                textColor = Colors.black;
+                                borderColor = Colors.white;
+                              } else if (isToday) {
+                                boxColor = primary;
+                                textColor = Colors.white;
+                                borderColor = primary;
+                              } else if (isPast) {
+                                boxColor = Colors.transparent;
+                                textColor = Colors.grey.shade600;
+                                borderColor = Colors.grey.shade800;
+                              } else {
+                                boxColor = Colors.transparent;
+                                textColor = Colors.white;
+                                borderColor = Colors.white;
+                              }
+
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    _weekdayShort(day.weekday),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: isToday ? primary : Colors.grey,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Container(
+                                    width: 36,
+                                    height: 36,
+                                    decoration: BoxDecoration(
+                                      color: boxColor,
+                                      border: Border.all(color: borderColor, width: 2),
+                                    ),
+                                    child: Center(
+                                      child: didWorkout
+                                          ? const Icon(Icons.check, color: Colors.black, size: 20)
+                                          : Text(
+                                              '${day.day}',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: textColor,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              // ─── SEÇÃO DE TREINOS ─────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                child: Text(
+                  'ROUTINES',
                   style: TextStyle(
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    color: isSelected ? Colors.black : Colors.white,
+                    fontSize: 24,
+                    color: Colors.grey.shade400,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2,
                   ),
                 ),
-                selected: isSelected,
-                onSelected: (val) {
-                  if (val) {
-                    ref.read(selectedDayProvider.notifier).state = day['value'] as int;
-                  }
-                },
-                selectedColor: Theme.of(context).colorScheme.primary,
-                backgroundColor: const Color(0xFF27272A),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
               ),
-            );
-          }).toList(),
+
+              // ─── LISTA DE TREINOS ─────────────────────────────────────
+              Expanded(
+                child: routinesAsync.when(
+                  data: (routines) {
+                    if (routines.isEmpty) {
+                      return const Center(
+                        child: Text(
+                          'NO ROUTINES FOUND.\nBUILD ONE.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey, fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                      itemCount: routines.length,
+                      itemBuilder: (context, index) {
+                        final routine = routines[index];
+                        final exCount = routine.exercises.length;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: GestureDetector(
+                            onTap: () async {
+                              final repo = ref.read(workoutRepositoryProvider);
+                              final session = await repo.startSession(routine);
+                              ref.invalidate(workoutSessionsProvider);
+                              if (context.mounted) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => ActiveWorkoutScreen(
+                                      routine: routine,
+                                      session: session,
+                                    ),
+                                  ),
+                                ).then((_) => ref.invalidate(workoutSessionsProvider));
+                              }
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1A1A1A),
+                                border: Border.all(color: Colors.white, width: 2),
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 12,
+                                    height: 80,
+                                    color: primary, // Barra lateral brutalista
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          routine.name.toUpperCase(),
+                                          style: const TextStyle(
+                                            fontSize: 26,
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            height: 1.1,
+                                          ),
+                                        ),
+                                        Text(
+                                          '$exCount EXERCISES',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                            fontWeight: FontWeight.bold,
+                                            letterSpacing: 1,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                                    height: 80,
+                                    decoration: const BoxDecoration(
+                                      border: Border(left: BorderSide(color: Colors.white, width: 2)),
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: const Text(
+                                      'START',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                  loading: () => const Center(child: Text('LOADING...', style: TextStyle(color: Colors.white, fontSize: 18))),
+                  error: (e, _) => Center(child: Text('ERROR: $e')),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

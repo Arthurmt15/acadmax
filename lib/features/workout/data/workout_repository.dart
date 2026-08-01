@@ -25,6 +25,87 @@ class WorkoutRepository {
     });
   }
 
+  // --- Sessões de Treino ---
+
+  Future<WorkoutSession> startSession(WorkoutRoutine routine) async {
+    final session = WorkoutSession()
+      ..startTime = DateTime.now();
+    await db.writeTxn(() async {
+      await db.workoutSessions.put(session);
+      session.routine.value = routine;
+      await session.routine.save();
+    });
+    return session;
+  }
+
+  Future<void> finishSession(WorkoutSession session) async {
+    session.endTime = DateTime.now();
+    await db.writeTxn(() async {
+      await db.workoutSessions.put(session);
+    });
+  }
+
+  Future<List<WorkoutSession>> getSessionsForMonth(int year, int month) async {
+    final start = DateTime(year, month, 1);
+    final end = DateTime(year, month + 1, 1);
+    return await db.workoutSessions
+        .filter()
+        .startTimeBetween(start, end)
+        .findAll();
+  }
+
+  Future<List<WorkoutSession>> getAllSessions() async {
+    return await db.workoutSessions.where().findAll();
+  }
+
+  // --- Evolução e Séries ---
+
+  Future<void> saveSetRecord(WorkoutSession session, Exercise exercise, int setNumber, double weight, int reps) async {
+    final record = SetRecord()
+      ..setNumber = setNumber
+      ..weight = weight
+      ..reps = reps
+      ..timestamp = DateTime.now();
+
+    await db.writeTxn(() async {
+      await db.setRecords.put(record);
+      record.session.value = session;
+      record.exercise.value = exercise;
+      await record.session.save();
+      await record.exercise.save();
+    });
+  }
+
+  /// Retorna o PR (Personal Record - Peso Máximo) para cada exercício, ordenado por data mais recente
+  Future<Map<Exercise, double>> getPersonalRecords() async {
+    final records = await db.setRecords.where().findAll();
+    final prs = <int, double>{}; // exerciseId -> maxWeight
+    final exercisesMap = <int, Exercise>{};
+
+    for (final r in records) {
+      await r.exercise.load();
+      final ex = r.exercise.value;
+      if (ex == null) continue;
+      
+      exercisesMap[ex.id] = ex;
+      
+      final currentMax = prs[ex.id] ?? 0.0;
+      if (r.weight > currentMax) {
+        prs[ex.id] = r.weight;
+      }
+    }
+
+    // Convertendo para map de Exercise -> double
+    final result = <Exercise, double>{};
+    for (final entry in prs.entries) {
+      if (exercisesMap.containsKey(entry.key)) {
+        result[exercisesMap[entry.key]!] = entry.value;
+      }
+    }
+
+    return result;
+  }
+
   // --- Exercícios ---
 
   Future<void> saveExercise(Exercise exercise) async {
@@ -40,8 +121,8 @@ class WorkoutRepository {
   Future<void> populateInitialExercises() async {
     final count = await db.exercises.filter().isCustomEqualTo(false).count();
     
-    // Se tivermos menos que a lista gigante, repovoar
-    if (count < 70) {
+    // Se tivermos menos que a lista completa, repovoar
+    if (count < 85) {
       await db.writeTxn(() async {
         // Limpar os antigos não customizados para não duplicar
         await db.exercises.filter().isCustomEqualTo(false).deleteAll();
@@ -130,6 +211,23 @@ class WorkoutRepository {
           Exercise()..name = 'Russian Twist'..muscleGroup = MuscleGroup.core,
           Exercise()..name = 'Prancha Lateral'..muscleGroup = MuscleGroup.core,
           Exercise()..name = 'Abdominal Canivete'..muscleGroup = MuscleGroup.core,
+
+          // ── Peso Corporal (Bodyweight) ──────────────────────────
+          Exercise()..name = 'Flexão de Braço'..muscleGroup = MuscleGroup.chest..isBodyweight = true,
+          Exercise()..name = 'Flexão Diamante'..muscleGroup = MuscleGroup.triceps..isBodyweight = true,
+          Exercise()..name = 'Flexão Fechada'..muscleGroup = MuscleGroup.chest..isBodyweight = true,
+          Exercise()..name = 'Barra Fixa (Bodyweight)'..muscleGroup = MuscleGroup.back..isBodyweight = true,
+          Exercise()..name = 'Barra Supinada (Bodyweight)'..muscleGroup = MuscleGroup.biceps..isBodyweight = true,
+          Exercise()..name = 'Mergulho nas Paralelas (Bodyweight)'..muscleGroup = MuscleGroup.triceps..isBodyweight = true,
+          Exercise()..name = 'Agachamento Livre (Bodyweight)'..muscleGroup = MuscleGroup.legs..isBodyweight = true,
+          Exercise()..name = 'Afundo (Bodyweight)'..muscleGroup = MuscleGroup.legs..isBodyweight = true,
+          Exercise()..name = 'Agachamento Búlgaro (Bodyweight)'..muscleGroup = MuscleGroup.legs..isBodyweight = true,
+          Exercise()..name = 'Elevação de Quadril (Bodyweight)'..muscleGroup = MuscleGroup.legs..isBodyweight = true,
+          Exercise()..name = 'Prancha (Bodyweight)'..muscleGroup = MuscleGroup.core..isBodyweight = true,
+          Exercise()..name = 'Burpee'..muscleGroup = MuscleGroup.core..isBodyweight = true,
+          Exercise()..name = 'Mountain Climber'..muscleGroup = MuscleGroup.core..isBodyweight = true,
+          Exercise()..name = 'Superman'..muscleGroup = MuscleGroup.back..isBodyweight = true,
+          Exercise()..name = 'Pike Push-Up'..muscleGroup = MuscleGroup.shoulders..isBodyweight = true,
         ];
         
         await db.exercises.putAll(initialExercises);

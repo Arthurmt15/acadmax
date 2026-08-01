@@ -185,7 +185,9 @@ class _EditRoutineScreenState extends ConsumerState<EditRoutineScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Exercícios', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const Flexible(
+                  child: Text('Exercícios', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
                 TextButton.icon(
                   onPressed: _showAddExerciseDialog,
                   icon: const Icon(Icons.add),

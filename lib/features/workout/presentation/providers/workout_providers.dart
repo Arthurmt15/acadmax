@@ -10,18 +10,13 @@ final workoutRepositoryProvider = Provider<WorkoutRepository>((ref) {
   return WorkoutRepository(isar);
 });
 
-final selectedDayProvider = StateProvider<int>((ref) => DateTime.now().weekday);
-
 final workoutRoutinesProvider = FutureProvider<List<WorkoutRoutine>>((ref) async {
   final repository = ref.watch(workoutRepositoryProvider);
-  return repository.getAllRoutines();
-});
-
-final routinesForSelectedDayProvider = FutureProvider<List<WorkoutRoutine>>((ref) async {
-  final routines = await ref.watch(workoutRoutinesProvider.future);
-  final selectedDay = ref.watch(selectedDayProvider);
-  
-  return routines.where((r) => r.daysOfWeek.contains(selectedDay)).toList();
+  final routines = await repository.getAllRoutines();
+  for (final r in routines) {
+    await r.exercises.load();
+  }
+  return routines;
 });
 
 final exercisesProvider = FutureProvider<List<Exercise>>((ref) async {
@@ -29,3 +24,8 @@ final exercisesProvider = FutureProvider<List<Exercise>>((ref) async {
   return repository.getAllExercises();
 });
 
+// Todas as sessões (filtro por semana é feito na UI)
+final workoutSessionsProvider = FutureProvider<List<WorkoutSession>>((ref) async {
+  final repository = ref.watch(workoutRepositoryProvider);
+  return repository.getAllSessions();
+});

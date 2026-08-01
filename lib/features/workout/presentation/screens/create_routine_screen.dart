@@ -20,24 +20,13 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
   MuscleGroup? _selectedFilter;
 
   @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final selectedDay = ref.read(selectedDayProvider);
-      setState(() {
-        _selectedDays.add(selectedDay);
-      });
-    });
-  }
-
-  @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
   }
 
   Future<void> _saveRoutine() async {
-    if (_formKey.currentState!.validate() && _selectedDays.isNotEmpty) {
+    if (_formKey.currentState!.validate()) {
       final repo = ref.read(workoutRepositoryProvider);
       
       final routine = WorkoutRoutine()
@@ -52,19 +41,20 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Treino criado com sucesso!')),
+          SnackBar(
+            content: const Text('ROUTINE CREATED', style: TextStyle(fontWeight: FontWeight.bold)),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          ),
         );
       }
-    } else if (_selectedDays.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecione ao menos um dia da semana.')),
-      );
     }
   }
 
   Future<void> _showAddExerciseDialog() async {
     final nameCtrl = TextEditingController();
     MuscleGroup selectedGroup = MuscleGroup.chest;
+    final primary = Theme.of(context).colorScheme.primary;
 
     await showDialog(
       context: context,
@@ -72,17 +62,29 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return AlertDialog(
-              title: const Text('Novo Exercício'),
+              backgroundColor: const Color(0xFF111111),
+              shape: const RoundedRectangleBorder(
+                side: BorderSide(color: Colors.white, width: 2),
+                borderRadius: BorderRadius.zero,
+              ),
+              title: const Text('NEW EXERCISE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: nameCtrl,
-                    decoration: const InputDecoration(labelText: 'Nome do Exercício'),
+                    style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      labelText: 'EXERCISE NAME',
+                      labelStyle: TextStyle(color: Colors.grey),
+                      enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey, width: 2)),
+                      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   DropdownButtonFormField<MuscleGroup>(
                     value: selectedGroup,
+                    dropdownColor: const Color(0xFF1A1A1A),
                     items: MuscleGroup.values.map((mg) {
                       return DropdownMenuItem(
                         value: mg,
@@ -94,14 +96,19 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                         setStateDialog(() => selectedGroup = val);
                       }
                     },
-                    decoration: const InputDecoration(labelText: 'Grupo Muscular'),
+                    decoration: const InputDecoration(
+                      labelText: 'MUSCLE GROUP',
+                      labelStyle: TextStyle(color: Colors.grey),
+                      enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey, width: 2)),
+                      focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
+                    ),
                   ),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancelar'),
+                  child: const Text('CANCEL', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -117,7 +124,12 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                       if (context.mounted) Navigator.pop(context);
                     }
                   },
-                  child: const Text('Salvar'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primary,
+                    foregroundColor: Colors.white,
+                    side: BorderSide.none,
+                  ),
+                  child: const Text('SAVE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ],
             );
@@ -130,13 +142,19 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
   @override
   Widget build(BuildContext context) {
     final exercisesAsync = ref.watch(exercisesProvider);
+    final primary = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
+      backgroundColor: const Color(0xFF111111),
       appBar: AppBar(
-        title: const Text('Novo Treino'),
+        title: const Text('NEW ROUTINE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, letterSpacing: 2)),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(2),
+          child: Container(color: Colors.white, height: 2),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.check),
+            icon: const Icon(Icons.check, size: 32),
             onPressed: _saveRoutine,
           )
         ],
@@ -145,128 +163,135 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
         child: Form(
           key: _formKey,
           child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            TextFormField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nome do Treino',
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) => value == null || value.isEmpty ? 'Informe um nome' : null,
-            ),
-            const SizedBox(height: 20),
-            const Text('Dias da Semana', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              children: [
-                _buildDayChip('Seg', 1),
-                _buildDayChip('Ter', 2),
-                _buildDayChip('Qua', 3),
-                _buildDayChip('Qui', 4),
-                _buildDayChip('Sex', 5),
-                _buildDayChip('Sáb', 6),
-                _buildDayChip('Dom', 7),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Exercícios', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                TextButton.icon(
-                  onPressed: _showAddExerciseDialog,
-                  icon: const Icon(Icons.add),
-                  label: const Text('Criar Novo'),
+            padding: const EdgeInsets.all(20),
+            children: [
+              TextFormField(
+                controller: _nameController,
+                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                decoration: InputDecoration(
+                  labelText: 'ROUTINE NAME',
+                  labelStyle: TextStyle(color: Colors.grey.shade400, fontSize: 16, fontWeight: FontWeight.bold),
+                  border: const OutlineInputBorder(
+                    borderRadius: BorderRadius.zero,
+                    borderSide: BorderSide(color: Colors.white, width: 2),
+                  ),
+                  enabledBorder: const OutlineInputBorder(
+                    borderRadius: BorderRadius.zero,
+                    borderSide: BorderSide(color: Colors.white, width: 2),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.zero,
+                    borderSide: BorderSide(color: primary, width: 3),
+                  ),
+                  filled: true,
+                  fillColor: const Color(0xFF1A1A1A),
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              decoration: const InputDecoration(
-                labelText: 'Pesquisar Exercício',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+                validator: (value) => value == null || value.isEmpty ? 'REQUIRED' : null,
               ),
-              onChanged: (val) => setState(() => _searchQuery = val),
-            ),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8.0,
-              runSpacing: 8.0,
-              children: [
-                FilterChip(
-                  label: const Text('Todos'),
-                  selected: _selectedFilter == null,
-                  selectedColor: Theme.of(context).colorScheme.primary,
-                  onSelected: (_) => setState(() => _selectedFilter = null),
+              const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('EXERCISES', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, letterSpacing: 2)),
+                  TextButton.icon(
+                    onPressed: _showAddExerciseDialog,
+                    icon: Icon(Icons.add, color: primary),
+                    label: Text('NEW', style: TextStyle(color: primary, fontWeight: FontWeight.bold, fontSize: 16)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                decoration: const InputDecoration(
+                  labelText: 'SEARCH',
+                  labelStyle: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                  prefixIcon: Icon(Icons.search, color: Colors.white),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.zero,
+                    borderSide: BorderSide(color: Colors.grey, width: 2),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.zero,
+                    borderSide: BorderSide(color: Colors.grey, width: 2),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.zero,
+                    borderSide: BorderSide(color: Colors.white, width: 2),
+                  ),
+                  filled: true,
+                  fillColor: Color(0xFF1A1A1A),
                 ),
-                ...MuscleGroup.values.map((mg) {
-                  return FilterChip(
-                    label: Text(mg.name),
-                    selected: _selectedFilter == mg,
-                    selectedColor: Theme.of(context).colorScheme.primary,
-                    onSelected: (_) => setState(() => _selectedFilter = mg),
-                  );
-                }).toList(),
-              ],
-            ),
-            const SizedBox(height: 16),
-            exercisesAsync.when(
-              data: (exercises) {
-                var filtered = exercises.where((ex) {
-                  final matchesQuery = ex.name.toLowerCase().contains(_searchQuery.toLowerCase());
-                  final matchesFilter = _selectedFilter == null || ex.muscleGroup == _selectedFilter;
-                  return matchesQuery && matchesFilter;
-                }).toList();
-
-                if (filtered.isEmpty) return const Text('Nenhum exercício encontrado.');
-                
-                return Column(
-                  children: filtered.map((ex) {
-                    final isSelected = _selectedExercises.contains(ex);
-                    return CheckboxListTile(
-                      title: Text(ex.name),
-                      subtitle: Text(ex.muscleGroup.name),
-                      value: isSelected,
-                      activeColor: Theme.of(context).colorScheme.primary,
-                      checkColor: Colors.black,
-                      onChanged: (bool? val) {
-                        setState(() {
-                          if (val == true) {
-                            _selectedExercises.add(ex);
-                          } else {
-                            _selectedExercises.remove(ex);
-                          }
-                        });
-                      },
+                onChanged: (val) => setState(() => _searchQuery = val),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children: [
+                  FilterChip(
+                    label: const Text('ALL'),
+                    selected: _selectedFilter == null,
+                    selectedColor: primary,
+                    onSelected: (_) => setState(() => _selectedFilter = null),
+                  ),
+                  ...MuscleGroup.values.map((mg) {
+                    return FilterChip(
+                      label: Text(mg.name.toUpperCase()),
+                      selected: _selectedFilter == mg,
+                      selectedColor: primary,
+                      onSelected: (_) => setState(() => _selectedFilter = mg),
                     );
                   }).toList(),
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text('Erro: $e'),
-            ),
-          ],
+                ],
+              ),
+              const SizedBox(height: 24),
+              exercisesAsync.when(
+                data: (exercises) {
+                  var filtered = exercises.where((ex) {
+                    final matchesQuery = ex.name.toLowerCase().contains(_searchQuery.toLowerCase());
+                    final matchesFilter = _selectedFilter == null || ex.muscleGroup == _selectedFilter;
+                    return matchesQuery && matchesFilter;
+                  }).toList();
+
+                  if (filtered.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Text('NOT FOUND.', style: TextStyle(color: Colors.grey.shade600, fontSize: 24, fontWeight: FontWeight.bold)),
+                    );
+                  }
+                  
+                  return Column(
+                    children: filtered.map((ex) {
+                      final isSelected = _selectedExercises.contains(ex);
+                      return CheckboxListTile(
+                        title: Text(ex.name.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                        subtitle: Text(ex.muscleGroup.name.toUpperCase(), style: TextStyle(color: Colors.grey.shade400, fontWeight: FontWeight.bold)),
+                        value: isSelected,
+                        activeColor: primary,
+                        checkColor: Colors.white,
+                        tileColor: isSelected ? const Color(0xFF1A1A1A) : Colors.transparent,
+                        shape: const Border(bottom: BorderSide(color: Color(0xFF333333), width: 1)),
+                        onChanged: (bool? val) {
+                          setState(() {
+                            if (val == true) {
+                              _selectedExercises.add(ex);
+                            } else {
+                              _selectedExercises.remove(ex);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) => Text('ERROR: $e'),
+              ),
+            ],
+          ),
         ),
       ),
-      ),
-    );
-  }
-
-  Widget _buildDayChip(String label, int day) {
-    final isSelected = _selectedDays.contains(day);
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      selectedColor: Theme.of(context).colorScheme.primary,
-      onSelected: (val) {
-        setState(() {
-          if (val) _selectedDays.add(day);
-          else _selectedDays.remove(day);
-        });
-      },
     );
   }
 }

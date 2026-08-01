@@ -17,6 +17,7 @@ class Exercise {
   late MuscleGroup muscleGroup;
 
   bool isCustom = false;
+  bool isBodyweight = false;
 }
 
 @collection

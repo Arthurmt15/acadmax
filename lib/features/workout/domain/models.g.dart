@@ -17,19 +17,24 @@ const ExerciseSchema = CollectionSchema(
   name: r'Exercise',
   id: 2972066467915231902,
   properties: {
-    r'isCustom': PropertySchema(
+    r'isBodyweight': PropertySchema(
       id: 0,
+      name: r'isBodyweight',
+      type: IsarType.bool,
+    ),
+    r'isCustom': PropertySchema(
+      id: 1,
       name: r'isCustom',
       type: IsarType.bool,
     ),
     r'muscleGroup': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'muscleGroup',
       type: IsarType.byte,
       enumMap: _ExercisemuscleGroupEnumValueMap,
     ),
     r'name': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'name',
       type: IsarType.string,
     )
@@ -78,9 +83,10 @@ void _exerciseSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.isCustom);
-  writer.writeByte(offsets[1], object.muscleGroup.index);
-  writer.writeString(offsets[2], object.name);
+  writer.writeBool(offsets[0], object.isBodyweight);
+  writer.writeBool(offsets[1], object.isCustom);
+  writer.writeByte(offsets[2], object.muscleGroup.index);
+  writer.writeString(offsets[3], object.name);
 }
 
 Exercise _exerciseDeserialize(
@@ -91,11 +97,12 @@ Exercise _exerciseDeserialize(
 ) {
   final object = Exercise();
   object.id = id;
-  object.isCustom = reader.readBool(offsets[0]);
+  object.isBodyweight = reader.readBool(offsets[0]);
+  object.isCustom = reader.readBool(offsets[1]);
   object.muscleGroup =
-      _ExercisemuscleGroupValueEnumMap[reader.readByteOrNull(offsets[1])] ??
+      _ExercisemuscleGroupValueEnumMap[reader.readByteOrNull(offsets[2])] ??
           MuscleGroup.chest;
-  object.name = reader.readString(offsets[2]);
+  object.name = reader.readString(offsets[3]);
   return object;
 }
 
@@ -109,9 +116,11 @@ P _exerciseDeserializeProp<P>(
     case 0:
       return (reader.readBool(offset)) as P;
     case 1:
+      return (reader.readBool(offset)) as P;
+    case 2:
       return (_ExercisemuscleGroupValueEnumMap[reader.readByteOrNull(offset)] ??
           MuscleGroup.chest) as P;
-    case 2:
+    case 3:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -421,6 +430,16 @@ extension ExerciseQueryFilter
     });
   }
 
+  QueryBuilder<Exercise, Exercise, QAfterFilterCondition> isBodyweightEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isBodyweight',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<Exercise, Exercise, QAfterFilterCondition> isCustomEqualTo(
       bool value) {
     return QueryBuilder.apply(this, (query) {
@@ -623,6 +642,18 @@ extension ExerciseQueryLinks
     on QueryBuilder<Exercise, Exercise, QFilterCondition> {}
 
 extension ExerciseQuerySortBy on QueryBuilder<Exercise, Exercise, QSortBy> {
+  QueryBuilder<Exercise, Exercise, QAfterSortBy> sortByIsBodyweight() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isBodyweight', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterSortBy> sortByIsBodyweightDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isBodyweight', Sort.desc);
+    });
+  }
+
   QueryBuilder<Exercise, Exercise, QAfterSortBy> sortByIsCustom() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isCustom', Sort.asc);
@@ -674,6 +705,18 @@ extension ExerciseQuerySortThenBy
     });
   }
 
+  QueryBuilder<Exercise, Exercise, QAfterSortBy> thenByIsBodyweight() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isBodyweight', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Exercise, Exercise, QAfterSortBy> thenByIsBodyweightDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isBodyweight', Sort.desc);
+    });
+  }
+
   QueryBuilder<Exercise, Exercise, QAfterSortBy> thenByIsCustom() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isCustom', Sort.asc);
@@ -713,6 +756,12 @@ extension ExerciseQuerySortThenBy
 
 extension ExerciseQueryWhereDistinct
     on QueryBuilder<Exercise, Exercise, QDistinct> {
+  QueryBuilder<Exercise, Exercise, QDistinct> distinctByIsBodyweight() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isBodyweight');
+    });
+  }
+
   QueryBuilder<Exercise, Exercise, QDistinct> distinctByIsCustom() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isCustom');
@@ -738,6 +787,12 @@ extension ExerciseQueryProperty
   QueryBuilder<Exercise, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Exercise, bool, QQueryOperations> isBodyweightProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isBodyweight');
     });
   }
 

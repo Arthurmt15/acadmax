@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models.dart';
 import '../providers/workout_providers.dart';
+import 'package:gym_tracker/l10n/app_localizations.dart';
 
 class CreateRoutineScreen extends ConsumerStatefulWidget {
   const CreateRoutineScreen({Key? key}) : super(key: key);
@@ -42,7 +43,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('ROUTINE CREATED', style: TextStyle(fontWeight: FontWeight.bold)),
+            content: Text(AppLocalizations.of(context)!.routineCreatedUpper, style: const TextStyle(fontWeight: FontWeight.bold)),
             backgroundColor: Theme.of(context).colorScheme.primary,
             shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           ),
@@ -67,16 +68,16 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                 side: BorderSide(color: Colors.white, width: 2),
                 borderRadius: BorderRadius.zero,
               ),
-              title: const Text('NEW EXERCISE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+              title: Text(AppLocalizations.of(context)!.newExerciseUpper, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: nameCtrl,
                     style: const TextStyle(color: Colors.white),
-                    decoration: const InputDecoration(
-                      labelText: 'EXERCISE NAME',
-                      labelStyle: TextStyle(color: Colors.grey),
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.exerciseNameUpper,
+                      labelStyle: const TextStyle(color: Colors.grey),
                       enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey, width: 2)),
                       focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
                     ),
@@ -96,9 +97,9 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                         setStateDialog(() => selectedGroup = val);
                       }
                     },
-                    decoration: const InputDecoration(
-                      labelText: 'MUSCLE GROUP',
-                      labelStyle: TextStyle(color: Colors.grey),
+                    decoration: InputDecoration(
+                      labelText: AppLocalizations.of(context)!.muscleGroupUpper,
+                      labelStyle: const TextStyle(color: Colors.grey),
                       enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey, width: 2)),
                       focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.white, width: 2)),
                     ),
@@ -108,7 +109,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('CANCEL', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: Text(AppLocalizations.of(context)!.cancelUpper, style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -129,7 +130,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                     foregroundColor: Colors.white,
                     side: BorderSide.none,
                   ),
-                  child: const Text('SAVE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: Text(AppLocalizations.of(context)!.saveUpper, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ],
             );
@@ -147,7 +148,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF111111),
       appBar: AppBar(
-        title: const Text('NEW ROUTINE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, letterSpacing: 2)),
+        title: Text(AppLocalizations.of(context)!.newRoutineUpper, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24, letterSpacing: 2)),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
           child: Container(color: Colors.white, height: 2),
@@ -169,7 +170,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                 controller: _nameController,
                 style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(
-                  labelText: 'ROUTINE NAME',
+                  labelText: AppLocalizations.of(context)!.routineNameUpper,
                   labelStyle: TextStyle(color: Colors.grey.shade400, fontSize: 16, fontWeight: FontWeight.bold),
                   border: const OutlineInputBorder(
                     borderRadius: BorderRadius.zero,
@@ -186,27 +187,27 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                   filled: true,
                   fillColor: const Color(0xFF1A1A1A),
                 ),
-                validator: (value) => value == null || value.isEmpty ? 'REQUIRED' : null,
+                validator: (value) => value == null || value.isEmpty ? AppLocalizations.of(context)!.requiredUpper : null,
               ),
               const SizedBox(height: 32),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('EXERCISES', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, letterSpacing: 2)),
+                  Text(AppLocalizations.of(context)!.exercisesUpper, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24, letterSpacing: 2)),
                   TextButton.icon(
                     onPressed: _showAddExerciseDialog,
                     icon: Icon(Icons.add, color: primary),
-                    label: Text('NEW', style: TextStyle(color: primary, fontWeight: FontWeight.bold, fontSize: 16)),
+                    label: Text(AppLocalizations.of(context)!.newUpper, style: TextStyle(color: primary, fontWeight: FontWeight.bold, fontSize: 16)),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               TextField(
                 style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                decoration: const InputDecoration(
-                  labelText: 'SEARCH',
-                  labelStyle: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
-                  prefixIcon: Icon(Icons.search, color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.of(context)!.searchUpper,
+                  labelStyle: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.zero,
                     borderSide: BorderSide(color: Colors.grey, width: 2),
@@ -230,7 +231,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                 runSpacing: 8.0,
                 children: [
                   FilterChip(
-                    label: const Text('ALL'),
+                    label: Text(AppLocalizations.of(context)!.allUpper),
                     selected: _selectedFilter == null,
                     selectedColor: primary,
                     onSelected: (_) => setState(() => _selectedFilter = null),
@@ -257,7 +258,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                   if (filtered.isEmpty) {
                     return Padding(
                       padding: const EdgeInsets.all(24.0),
-                      child: Text('NOT FOUND.', style: TextStyle(color: Colors.grey.shade600, fontSize: 24, fontWeight: FontWeight.bold)),
+                      child: Text(AppLocalizations.of(context)!.notFoundUpper, style: TextStyle(color: Colors.grey.shade600, fontSize: 24, fontWeight: FontWeight.bold)),
                     );
                   }
                   
@@ -286,7 +287,7 @@ class _CreateRoutineScreenState extends ConsumerState<CreateRoutineScreen> {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Text('ERROR: $e'),
+                error: (e, _) => Text(AppLocalizations.of(context)!.errorUpper(e.toString())),
               ),
             ],
           ),

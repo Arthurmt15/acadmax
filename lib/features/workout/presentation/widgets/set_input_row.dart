@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_tracker/l10n/app_localizations.dart';
 
 class SetInputRow extends StatefulWidget {
   final int setNumber;
@@ -88,9 +89,9 @@ class _SetInputRowState extends State<SetInputRow> {
                     border: Border.all(color: Colors.grey.shade600, width: 2),
                   ),
                   alignment: Alignment.center,
-                  child: const Text(
-                    'BODY',
-                    style: TextStyle(
+                  child: Text(
+                    AppLocalizations.of(context)!.bodyUpper,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -106,7 +107,7 @@ class _SetInputRowState extends State<SetInputRow> {
                     style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                     decoration: InputDecoration(
-                      hintText: 'KG',
+                      hintText: AppLocalizations.of(context)!.kg,
                       hintStyle: TextStyle(color: Colors.grey.shade700, fontSize: 20),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.zero,
@@ -141,7 +142,7 @@ class _SetInputRowState extends State<SetInputRow> {
                 style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
-                  hintText: 'REPS',
+                  hintText: AppLocalizations.of(context)!.repsUpper,
                   hintStyle: TextStyle(color: Colors.grey.shade700, fontSize: 20),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.zero,
@@ -178,9 +179,9 @@ class _SetInputRowState extends State<SetInputRow> {
               alignment: Alignment.center,
               child: _completed
                   ? const Icon(Icons.check, color: Colors.white, size: 32)
-                  : const Text(
-                      'DO',
-                      style: TextStyle(
+                  : Text(
+                      AppLocalizations.of(context)!.doUpper,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 20,

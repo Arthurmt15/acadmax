@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models.dart';
 import '../providers/workout_providers.dart';
+import 'package:gym_tracker/l10n/app_localizations.dart';
 
 final personalRecordsProvider = FutureProvider<Map<Exercise, double>>((ref) async {
   final repo = ref.watch(workoutRepositoryProvider);
@@ -19,7 +20,7 @@ class EvolutionScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF111111),
       appBar: AppBar(
-        title: const Text('EVOLUTION', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, letterSpacing: 2)),
+        title: Text(AppLocalizations.of(context)!.evolutionUpper, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24, letterSpacing: 2)),
         bottom: const PreferredSize(
           preferredSize: Size.fromHeight(2),
           child: ColoredBox(color: Colors.white, child: SizedBox(height: 2, width: double.infinity)),
@@ -33,10 +34,10 @@ class EvolutionScreen extends ConsumerWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('NO RECORDS.', style: TextStyle(color: Colors.grey.shade600, fontSize: 32, fontWeight: FontWeight.bold)),
+                    Text(AppLocalizations.of(context)!.noRecordsUpper, style: TextStyle(color: Colors.grey.shade600, fontSize: 32, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 16),
                     Text(
-                      'START LIFTING TO BUILD YOUR LEGACY.',
+                      AppLocalizations.of(context)!.startLiftingUpper,
                       style: TextStyle(color: Colors.grey.shade500, fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -98,7 +99,7 @@ class EvolutionScreen extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'MAX LOAD',
+                                AppLocalizations.of(context)!.maxLoadUpper,
                                 style: TextStyle(color: Colors.grey.shade400, fontSize: 10, fontWeight: FontWeight.bold),
                               ),
                               Row(
@@ -117,9 +118,9 @@ class EvolutionScreen extends ConsumerWidget {
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-                                  const Text(
-                                    'KG',
-                                    style: TextStyle(
+                                  Text(
+                                    AppLocalizations.of(context)!.kg,
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -138,7 +139,7 @@ class EvolutionScreen extends ConsumerWidget {
             );
           },
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, stack) => Center(child: Text('ERROR: $e')),
+          error: (e, stack) => Center(child: Text(AppLocalizations.of(context)!.errorUpper(e.toString()))),
         ),
       ),
     );

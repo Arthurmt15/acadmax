@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'set_input_row.dart';
 import '../../domain/models.dart';
 import '../providers/workout_providers.dart';
+import 'package:gym_tracker/l10n/app_localizations.dart';
 
 class ExerciseCard extends ConsumerStatefulWidget {
   final Exercise exercise;
@@ -81,7 +82,7 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'PROGRESS: $completedCount / $totalCount',
+                        AppLocalizations.of(context)!.progressUpper(completedCount, totalCount),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -101,7 +102,7 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard> {
                       border: Border.all(color: Colors.white, width: 2),
                     ),
                     child: Text(
-                      _isBodyweight ? 'BODYWT' : 'WEIGHT',
+                      _isBodyweight ? AppLocalizations.of(context)!.bodywtUpper : AppLocalizations.of(context)!.weightUpper,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -124,7 +125,12 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard> {
                 border: Border(bottom: BorderSide(color: Colors.white, width: 2)),
               ),
               child: Text(
-                'LAST: ${widget.lastWorkoutWeight}KG x ${widget.lastWorkoutReps}',
+                AppLocalizations.of(context)!.lastRecordUpper(
+                  widget.lastWorkoutWeight == widget.lastWorkoutWeight?.truncateToDouble()
+                      ? widget.lastWorkoutWeight!.toInt().toString()
+                      : widget.lastWorkoutWeight.toString(),
+                  widget.lastWorkoutReps!
+                ),
                 style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold, letterSpacing: 1),
               ),
             ),
@@ -142,7 +148,7 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        _isBodyweight ? 'TYPE' : 'KG',
+                        _isBodyweight ? AppLocalizations.of(context)!.typeUpper : AppLocalizations.of(context)!.kg,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
                           fontSize: 18,
@@ -152,11 +158,11 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard> {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'REPS',
+                        AppLocalizations.of(context)!.repsUpper,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.grey,
@@ -205,7 +211,7 @@ class _ExerciseCardState extends ConsumerState<ExerciseCard> {
                     ),
                     child: Center(
                       child: Text(
-                        '+ ADD SET',
+                        AppLocalizations.of(context)!.addSetUpper,
                         style: TextStyle(
                           fontSize: 20,
                           color: Colors.grey.shade400,

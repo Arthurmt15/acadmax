@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models.dart';
 import '../providers/workout_providers.dart';
+import 'package:gym_tracker/l10n/app_localizations.dart';
 
 class EditRoutineScreen extends ConsumerStatefulWidget {
   final WorkoutRoutine routine;
@@ -59,12 +60,12 @@ class _EditRoutineScreenState extends ConsumerState<EditRoutineScreen> {
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Treino atualizado com sucesso!')),
+          SnackBar(content: Text(AppLocalizations.of(context)!.routineUpdatedSuccess)),
         );
       }
     } else if (_selectedDays.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecione ao menos um dia da semana.')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.selectOneDayAtLeast)),
       );
     }
   }
@@ -79,13 +80,13 @@ class _EditRoutineScreenState extends ConsumerState<EditRoutineScreen> {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return AlertDialog(
-              title: const Text('Novo Exercício'),
+              title: Text(AppLocalizations.of(context)!.newExercise),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   TextField(
                     controller: nameCtrl,
-                    decoration: const InputDecoration(labelText: 'Nome do Exercício'),
+                    decoration: InputDecoration(labelText: AppLocalizations.of(context)!.exerciseName),
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<MuscleGroup>(
@@ -101,14 +102,14 @@ class _EditRoutineScreenState extends ConsumerState<EditRoutineScreen> {
                         setStateDialog(() => selectedGroup = val);
                       }
                     },
-                    decoration: const InputDecoration(labelText: 'Grupo Muscular'),
+                    decoration: InputDecoration(labelText: AppLocalizations.of(context)!.muscleGroup),
                   ),
                 ],
               ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancelar'),
+                  child: Text(AppLocalizations.of(context)!.cancel),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -124,7 +125,7 @@ class _EditRoutineScreenState extends ConsumerState<EditRoutineScreen> {
                       if (context.mounted) Navigator.pop(context);
                     }
                   },
-                  child: const Text('Salvar'),
+                  child: Text(AppLocalizations.of(context)!.save),
                 ),
               ],
             );
@@ -144,7 +145,7 @@ class _EditRoutineScreenState extends ConsumerState<EditRoutineScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Editar Treino'),
+        title: Text(AppLocalizations.of(context)!.editRoutine),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
@@ -160,14 +161,14 @@ class _EditRoutineScreenState extends ConsumerState<EditRoutineScreen> {
           children: [
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nome do Treino',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.routineName,
+                border: const OutlineInputBorder(),
               ),
-              validator: (value) => value == null || value.isEmpty ? 'Informe um nome' : null,
+              validator: (value) => value == null || value.isEmpty ? AppLocalizations.of(context)!.required : null,
             ),
             const SizedBox(height: 20),
-            const Text('Dias da Semana', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(AppLocalizations.of(context)!.daysOfWeek, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
@@ -185,22 +186,22 @@ class _EditRoutineScreenState extends ConsumerState<EditRoutineScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Flexible(
-                  child: Text('Exercícios', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Flexible(
+                  child: Text(AppLocalizations.of(context)!.exercises, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
                 TextButton.icon(
                   onPressed: _showAddExerciseDialog,
                   icon: const Icon(Icons.add),
-                  label: const Text('Criar Novo'),
+                  label: Text(AppLocalizations.of(context)!.createNew),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             TextField(
-              decoration: const InputDecoration(
-                labelText: 'Pesquisar Exercício',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.searchExercise,
+                prefixIcon: const Icon(Icons.search),
+                border: const OutlineInputBorder(),
               ),
               onChanged: (val) => setState(() => _searchQuery = val),
             ),
@@ -210,7 +211,7 @@ class _EditRoutineScreenState extends ConsumerState<EditRoutineScreen> {
               runSpacing: 8.0,
               children: [
                 FilterChip(
-                  label: const Text('Todos'),
+                  label: Text(AppLocalizations.of(context)!.all),
                   selected: _selectedFilter == null,
                   selectedColor: Theme.of(context).colorScheme.primary,
                   onSelected: (_) => setState(() => _selectedFilter = null),
@@ -234,7 +235,7 @@ class _EditRoutineScreenState extends ConsumerState<EditRoutineScreen> {
                   return matchesQuery && matchesFilter;
                 }).toList();
 
-                if (filtered.isEmpty) return const Text('Nenhum exercício encontrado.');
+                if (filtered.isEmpty) return Text(AppLocalizations.of(context)!.noExercisesFound);
                 
                 return Column(
                   children: filtered.map((ex) {
@@ -259,7 +260,7 @@ class _EditRoutineScreenState extends ConsumerState<EditRoutineScreen> {
                 );
               },
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) => Text('Erro: $e'),
+              error: (e, _) => Text(AppLocalizations.of(context)!.errorText(e.toString())),
             ),
           ],
         ),

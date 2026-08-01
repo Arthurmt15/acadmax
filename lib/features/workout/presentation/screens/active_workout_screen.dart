@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/exercise_card.dart';
 import '../../domain/models.dart';
 import '../providers/workout_providers.dart';
+import 'package:gym_tracker/l10n/app_localizations.dart';
 
 class ActiveWorkoutScreen extends ConsumerStatefulWidget {
   final WorkoutRoutine routine;
@@ -72,10 +73,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
                   color: primary,
                   border: Border.all(color: Colors.white, width: 2),
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'FINISH',
-                    style: TextStyle(
+                    AppLocalizations.of(context)!.finishUpper,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -95,10 +96,10 @@ class _ActiveWorkoutScreenState extends ConsumerState<ActiveWorkoutScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('EMPTY.', style: TextStyle(color: Colors.grey.shade600, fontSize: 48, fontWeight: FontWeight.bold)),
+                        Text(AppLocalizations.of(context)!.emptyUpper, style: TextStyle(color: Colors.grey.shade600, fontSize: 48, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 16),
                         Text(
-                          'ADD EXERCISES TO CONTINUE.',
+                          AppLocalizations.of(context)!.addExercisesToContinueUpper,
                           style: TextStyle(color: Colors.grey.shade500, fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ],

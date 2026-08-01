@@ -3,19 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/workout_providers.dart';
 import 'create_routine_screen.dart';
 import 'edit_routine_screen.dart';
+import 'package:gym_tracker/l10n/app_localizations.dart';
 
 class RoutinesScreen extends ConsumerWidget {
   const RoutinesScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
     final routinesAsync = ref.watch(workoutRoutinesProvider);
     final primary = Theme.of(context).colorScheme.primary;
 
     return Scaffold(
       backgroundColor: const Color(0xFF111111),
       appBar: AppBar(
-        title: const Text('ROUTINES', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24, letterSpacing: 2)),
+        title: Text(loc.routinesLabel, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24, letterSpacing: 2)),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(2),
           child: Container(color: Colors.white, height: 2),
@@ -26,7 +28,7 @@ class RoutinesScreen extends ConsumerWidget {
           if (routines.isEmpty) {
             return Center(
               child: Text(
-                'NO ROUTINES.\nCREATE ONE.',
+                loc.noRoutinesCreateOne,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey.shade600, fontSize: 24, fontWeight: FontWeight.bold),
               ),
@@ -55,7 +57,7 @@ class RoutinesScreen extends ConsumerWidget {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text('ROUTINE DELETED', style: TextStyle(fontWeight: FontWeight.bold)),
+                          content: Text(loc.routineDeletedUpper, style: const TextStyle(fontWeight: FontWeight.bold)),
                           backgroundColor: primary,
                           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                         ),
@@ -86,11 +88,11 @@ class RoutinesScreen extends ConsumerWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'DAYS: ${routine.daysOfWeek.join(", ")}',
+                                loc.daysLabelUpper(routine.daysOfWeek.join(", ")),
                                 style: TextStyle(color: Colors.grey.shade400, fontSize: 14, fontWeight: FontWeight.bold),
                               ),
                               Text(
-                                '${routine.exercises.length} EXERCISES',
+                                loc.exercisesCountUpper(routine.exercises.length),
                                 style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
                               ),
                             ],
@@ -114,7 +116,7 @@ class RoutinesScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('ERROR: $err')),
+        error: (err, stack) => Center(child: Text(loc.errorUpper(err.toString()))),
       ),
       floatingActionButton: Container(
         decoration: BoxDecoration(

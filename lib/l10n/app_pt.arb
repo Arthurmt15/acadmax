@@ -1,0 +1,156 @@
+{
+  "@@locale": "pt",
+  "appTitle": "Gym Tracker",
+  "myWorkouts": "Meus Treinos",
+  "noWorkoutsFound": "Nenhum treino cadastrado.\nClique no + para criar.",
+  "exercisesCount": "{count} exercícios",
+  "@exercisesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteWorkout": "Excluir treino",
+  "deleteWorkoutConfirm": "Deseja excluir \"{name}\"?",
+  "@deleteWorkoutConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cancel": "Cancelar",
+  "save": "Salvar",
+  "delete": "Excluir",
+  "workoutDeletedSuccess": "Treino excluído com sucesso!",
+  "errorText": "Erro: {error}",
+  "@errorText": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "morningGrind": "TREINO MATINAL",
+  "afternoonShift": "TURNO DA TARDE",
+  "nightOperation": "OPERAÇÃO NOTURNA",
+  "currentWeek": "SEMANA ATUAL",
+  "previousWeek": "SEMANA ANTERIOR",
+  "nextWeek": "PRÓXIMA SEMANA",
+  "overcome": "SUPERE-SE.",
+  "sessions": "TREINOS",
+  "routinesLabel": "ROTINAS",
+  "noRoutinesBuildOne": "NENHUMA ROTINA.\nCRIE UMA.",
+  "exercisesCountUpper": "{count} EXERCÍCIOS",
+  "@exercisesCountUpper": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "startWorkout": "INICIAR",
+  "loadingUpper": "CARREGANDO...",
+  "errorUpper": "ERRO: {error}",
+  "@errorUpper": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "noRoutinesCreateOne": "NENHUMA ROTINA.\nCRIE UMA.",
+  "routineDeletedUpper": "ROTINA EXCLUÍDA",
+  "daysLabelUpper": "DIAS: {days}",
+  "@daysLabelUpper": {
+    "placeholders": {
+      "days": { "type": "String" }
+    }
+  },
+  "routineCreatedUpper": "ROTINA CRIADA",
+  "newExerciseUpper": "NOVO EXERCÍCIO",
+  "exerciseNameUpper": "NOME DO EXERCÍCIO",
+  "muscleGroupUpper": "GRUPO MUSCULAR",
+  "cancelUpper": "CANCELAR",
+  "saveUpper": "SALVAR",
+  "newRoutineUpper": "NOVA ROTINA",
+  "routineNameUpper": "NOME DA ROTINA",
+  "requiredUpper": "OBRIGATÓRIO",
+  "exercisesUpper": "EXERCÍCIOS",
+  "newUpper": "NOVO",
+  "searchUpper": "BUSCAR",
+  "allUpper": "TODOS",
+  "notFoundUpper": "NÃO ENCONTRADO.",
+  "routineUpdatedSuccess": "Treino atualizado com sucesso!",
+  "selectOneDayAtLeast": "Selecione ao menos um dia da semana.",
+  "newExercise": "Novo Exercício",
+  "exerciseName": "Nome do Exercício",
+  "muscleGroup": "Grupo Muscular",
+  "editRoutine": "Editar Treino",
+  "routineName": "Nome do Treino",
+  "required": "Obrigatório",
+  "daysOfWeek": "Dias da Semana",
+  "exercises": "Exercícios",
+  "createNew": "Criar Novo",
+  "searchExercise": "Pesquisar Exercício",
+  "all": "Todos",
+  "noExercisesFound": "Nenhum exercício encontrado.",
+  "finishUpper": "FINALIZAR",
+  "emptyUpper": "VAZIO.",
+  "addExercisesToContinueUpper": "ADICIONE EXERCÍCIOS PARA CONTINUAR.",
+  "suggestionsTitle": "Sugestões",
+  "forMen": "Para Homens",
+  "forWomen": "Para Mulheres",
+  "suggestHypertrophyChest": "Hipertrofia - Peito e Tríceps",
+  "suggestHypertrophyChestDesc": "Foco em volume para a parte superior frontal.",
+  "suggestHypertrophyBack": "Hipertrofia - Costas e Bíceps",
+  "suggestHypertrophyBackDesc": "Desenvolvimento focado na largura e espessura das costas.",
+  "suggestGlutesQuads": "Foco Glúteos e Quadríceps",
+  "suggestGlutesQuadsDesc": "Treino inferior completo com ênfase em glúteos.",
+  "suggestHamstringsUpper": "Posterior e Superiores",
+  "suggestHamstringsUpperDesc": "Treino de membros superiores com foco no core.",
+  "exercisesLabel": "Exercícios:",
+  "addToMyRoutineUpper": "ADICIONAR À MINHA ROTINA",
+  "routineImported": "Treino importado! Vá na aba Treinos para configurá-lo.",
+  "exBenchPress": "Supino Reto",
+  "exInclineBenchPress": "Supino Inclinado",
+  "exFly": "Crucifixo",
+  "exTricepsPushdown": "Tríceps Polia",
+  "exSkullCrusher": "Tríceps Testa",
+  "exLatPulldown": "Puxada Frontal",
+  "exBentOverRow": "Remada Curvada",
+  "exBicepCurl": "Rosca Direta",
+  "exHammerCurl": "Rosca Martelo",
+  "exSquat": "Agachamento Livre",
+  "exHipThrust": "Elevação Pélvica",
+  "exLegPress": "Leg Press",
+  "exLegExtension": "Cadeira Extensora",
+  "exLegAbduction": "Cadeira Abdutora",
+  "exLegCurl": "Cadeira Flexora",
+  "exStiff": "Stiff",
+  "exLateralRaise": "Elevação Lateral",
+  "exCrunch": "Abdominal Supra",
+  "evolutionUpper": "EVOLUÇÃO",
+  "noRecordsUpper": "SEM RECORDES.",
+  "startLiftingUpper": "COMECE A TREINAR PARA CONSTRUIR SEU LEGADO.",
+  "maxLoadUpper": "CARGA MÁX.",
+  "kg": "KG",
+  "progressUpper": "PROGRESSO: {completed} / {total}",
+  "@progressUpper": {
+    "placeholders": {
+      "completed": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "bodywtUpper": "CORPO",
+  "weightUpper": "CARGA",
+  "lastRecordUpper": "ÚLT: {weight}KG x {reps}",
+  "@lastRecordUpper": {
+    "placeholders": {
+      "weight": { "type": "String" },
+      "reps": { "type": "int" }
+    }
+  },
+  "typeUpper": "TIPO",
+  "repsUpper": "REPS",
+  "addSetUpper": "+ ADICIONAR SÉRIE",
+  "bodyUpper": "CORPO",
+  "doUpper": "FEITO"
+}

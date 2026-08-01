@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/workout_providers.dart';
 import 'active_workout_screen.dart';
-
+import 'package:gym_tracker/l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 final weekOffsetProvider = StateProvider<int>((ref) => 0);
 
 class AgendaScreen extends ConsumerStatefulWidget {
@@ -43,22 +44,19 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
     super.dispose();
   }
 
-  String _getGreeting() {
+  String _getGreeting(AppLocalizations loc) {
     final hour = DateTime.now().hour;
-    if (hour >= 6 && hour < 12) return 'MORNING GRIND';
-    if (hour >= 12 && hour < 18) return 'AFTERNOON SHIFT';
-    return 'NIGHT OPERATION';
+    if (hour >= 6 && hour < 12) return loc.morningGrind;
+    if (hour >= 12 && hour < 18) return loc.afternoonShift;
+    return loc.nightOperation;
   }
 
-  String _weekdayShort(int weekday) {
-    const s = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
-    return s[weekday - 1];
+  String _weekdayShort(DateTime day, String locale) {
+    return DateFormat.E(locale).format(day).toUpperCase();
   }
 
-  String _monthShort(int month) {
-    const s = ['', 'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-                'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-    return s[month];
+  String _monthShort(DateTime day, String locale) {
+    return DateFormat.MMM(locale).format(day).toUpperCase();
   }
 
   DateTime _getMondayOf(int weekOffset) {
@@ -70,19 +68,21 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
         .add(Duration(days: weekOffset * 7));
   }
 
-  String _weekLabel(int offset, DateTime monday) {
+  String _weekLabel(int offset, DateTime monday, AppLocalizations loc, String localeName) {
     final sunday = monday.add(const Duration(days: 6));
-    if (offset == 0) return 'CURRENT WEEK';
-    if (offset == -1) return 'PREVIOUS WEEK';
-    if (offset == 1) return 'NEXT WEEK';
+    if (offset == 0) return loc.currentWeek;
+    if (offset == -1) return loc.previousWeek;
+    if (offset == 1) return loc.nextWeek;
     if (monday.month == sunday.month) {
-      return '${monday.day}-${sunday.day} ${_monthShort(monday.month)}';
+      return '${monday.day}-${sunday.day} ${_monthShort(monday, localeName)}';
     }
-    return '${monday.day} ${_monthShort(monday.month)} - ${sunday.day} ${_monthShort(sunday.month)}';
+    return '${monday.day} ${_monthShort(monday, localeName)} - ${sunday.day} ${_monthShort(sunday, localeName)}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final localeName = Localizations.localeOf(context).toString();
     final routinesAsync = ref.watch(workoutRoutinesProvider);
     final sessionsAsync = ref.watch(workoutSessionsProvider);
     final currentOffset = ref.watch(weekOffsetProvider);
@@ -140,7 +140,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            _getGreeting(),
+                            _getGreeting(loc),
                             style: const TextStyle(
                               fontSize: 14,
                               color: Colors.grey,
@@ -148,9 +148,9 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
-                            'OVERCOME.',
-                            style: TextStyle(
+                          Text(
+                            loc.overcome,
+                            style: const TextStyle(
                               fontSize: 48,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -176,9 +176,9 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
                               height: 1.0,
                             ),
                           ),
-                          const Text(
-                            'SESSIONS',
-                            style: TextStyle(
+                          Text(
+                            loc.sessions,
+                            style: const TextStyle(
                               fontSize: 10,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -207,7 +207,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
                   itemBuilder: (context, page) {
                     final offset = page - _centerPage;
                     final monday = _getMondayOf(offset);
-                    final label = _weekLabel(offset, monday);
+                    final label = _weekLabel(offset, monday, loc, localeName);
                     final isCurrentWeek = offset == 0;
 
                     return Container(
@@ -272,7 +272,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    _weekdayShort(day.weekday),
+                                    _weekdayShort(day, localeName),
                                     style: TextStyle(
                                       fontSize: 12,
                                       color: isToday ? primary : Colors.grey,
@@ -315,7 +315,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
                 child: Text(
-                  'ROUTINES',
+                  loc.routinesLabel,
                   style: TextStyle(
                     fontSize: 24,
                     color: Colors.grey.shade400,
@@ -330,11 +330,11 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
                 child: routinesAsync.when(
                   data: (routines) {
                     if (routines.isEmpty) {
-                      return const Center(
+                      return Center(
                         child: Text(
-                          'NO ROUTINES FOUND.\nBUILD ONE.',
+                          loc.noRoutinesBuildOne,
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey, fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(color: Colors.grey, fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       );
                     }
@@ -393,7 +393,7 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
                                           ),
                                         ),
                                         Text(
-                                          '$exCount EXERCISES',
+                                          loc.exercisesCountUpper(exCount),
                                           style: const TextStyle(
                                             fontSize: 14,
                                             color: Colors.grey,
@@ -411,9 +411,9 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
                                       border: Border(left: BorderSide(color: Colors.white, width: 2)),
                                     ),
                                     alignment: Alignment.center,
-                                    child: const Text(
-                                      'START',
-                                      style: TextStyle(
+                                    child: Text(
+                                      loc.startWorkout,
+                                      style: const TextStyle(
                                         fontSize: 20,
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
@@ -428,8 +428,8 @@ class _AgendaScreenState extends ConsumerState<AgendaScreen> {
                       },
                     );
                   },
-                  loading: () => const Center(child: Text('LOADING...', style: TextStyle(color: Colors.white, fontSize: 18))),
-                  error: (e, _) => Center(child: Text('ERROR: $e')),
+                  loading: () => Center(child: Text(loc.loadingUpper, style: const TextStyle(color: Colors.white, fontSize: 18))),
+                  error: (e, _) => Center(child: Text(loc.errorUpper(e.toString()))),
                 ),
               ),
             ],

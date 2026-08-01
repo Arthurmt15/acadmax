@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/workout_providers.dart';
 import 'create_routine_screen.dart';
 import 'edit_routine_screen.dart';
+import 'package:gym_tracker/l10n/app_localizations.dart';
 
 // home_screen.dart agora é só a tela de gerenciamento de treinos (lista + editar + criar)
 class HomeScreen extends ConsumerWidget {
@@ -14,16 +15,16 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Meus Treinos', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(AppLocalizations.of(context)!.myWorkouts, style: const TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: routinesAsync.when(
         data: (routines) {
           if (routines.isEmpty) {
-            return const Center(
+            return Center(
               child: Text(
-                'Nenhum treino cadastrado.\nClique no + para criar.',
+                AppLocalizations.of(context)!.noWorkoutsFound,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 16),
+                style: const TextStyle(color: Colors.grey, fontSize: 16),
               ),
             );
           }
@@ -36,7 +37,7 @@ class HomeScreen extends ConsumerWidget {
                 child: ListTile(
                   contentPadding: const EdgeInsets.all(16),
                   title: Text(routine.name, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  subtitle: Text('${routine.exercises.length} exercícios'),
+                  subtitle: Text(AppLocalizations.of(context)!.exercisesCount(routine.exercises.length)),
                   trailing: const Icon(Icons.edit, color: Colors.grey),
                   onTap: () {
                     Navigator.push(
@@ -50,11 +51,11 @@ class HomeScreen extends ConsumerWidget {
                     final confirm = await showDialog<bool>(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: const Text('Excluir treino'),
-                        content: Text('Deseja excluir "${routine.name}"?'),
+                        title: Text(AppLocalizations.of(context)!.deleteWorkout),
+                        content: Text(AppLocalizations.of(context)!.deleteWorkoutConfirm(routine.name)),
                         actions: [
-                          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancelar')),
-                          TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Excluir', style: TextStyle(color: Colors.red))),
+                          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(AppLocalizations.of(context)!.cancel)),
+                          TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(color: Colors.red))),
                         ],
                       ),
                     );
@@ -64,7 +65,7 @@ class HomeScreen extends ConsumerWidget {
                       ref.invalidate(workoutRoutinesProvider);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Treino excluído com sucesso!')),
+                          SnackBar(content: Text(AppLocalizations.of(context)!.workoutDeletedSuccess)),
                         );
                       }
                     }
@@ -75,7 +76,7 @@ class HomeScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Erro: $err')),
+        error: (err, stack) => Center(child: Text(AppLocalizations.of(context)!.errorText(err.toString()))),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Theme.of(context).colorScheme.primary,

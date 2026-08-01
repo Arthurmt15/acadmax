@@ -2,21 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/models.dart';
 import '../providers/workout_providers.dart';
+import 'package:gym_tracker/l10n/app_localizations.dart';
 
 class SuggestionsScreen extends ConsumerWidget {
   const SuggestionsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Sugestões', style: TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(loc.suggestionsTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
           bottom: TabBar(
-            tabs: const [
-              Tab(text: 'Para Homens'),
-              Tab(text: 'Para Mulheres'),
+            tabs: [
+              Tab(text: loc.forMen),
+              Tab(text: loc.forWomen),
             ],
             indicatorColor: Theme.of(context).colorScheme.primary,
             labelColor: Theme.of(context).colorScheme.primary,
@@ -33,61 +35,63 @@ class SuggestionsScreen extends ConsumerWidget {
   }
 
   Widget _buildMenSuggestions(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
     final suggestions = [
       _Suggestion(
-        name: 'Hipertrofia - Peito e Tríceps',
-        description: 'Foco em volume para a parte superior frontal.',
+        name: loc.suggestHypertrophyChest,
+        description: loc.suggestHypertrophyChestDesc,
         exercises: [
-          _SuggestedExercise('Supino Reto', MuscleGroup.chest),
-          _SuggestedExercise('Supino Inclinado', MuscleGroup.chest),
-          _SuggestedExercise('Crucifixo', MuscleGroup.chest),
-          _SuggestedExercise('Tríceps Polia', MuscleGroup.triceps),
-          _SuggestedExercise('Tríceps Testa', MuscleGroup.triceps),
+          _SuggestedExercise(loc.exBenchPress, 'Supino Reto', MuscleGroup.chest),
+          _SuggestedExercise(loc.exInclineBenchPress, 'Supino Inclinado', MuscleGroup.chest),
+          _SuggestedExercise(loc.exFly, 'Crucifixo', MuscleGroup.chest),
+          _SuggestedExercise(loc.exTricepsPushdown, 'Tríceps Polia', MuscleGroup.triceps),
+          _SuggestedExercise(loc.exSkullCrusher, 'Tríceps Testa', MuscleGroup.triceps),
         ],
       ),
       _Suggestion(
-        name: 'Hipertrofia - Costas e Bíceps',
-        description: 'Desenvolvimento focado na largura e espessura das costas.',
+        name: loc.suggestHypertrophyBack,
+        description: loc.suggestHypertrophyBackDesc,
         exercises: [
-          _SuggestedExercise('Puxada Frontal', MuscleGroup.back),
-          _SuggestedExercise('Remada Curvada', MuscleGroup.back),
-          _SuggestedExercise('Rosca Direta', MuscleGroup.biceps),
-          _SuggestedExercise('Rosca Martelo', MuscleGroup.biceps),
+          _SuggestedExercise(loc.exLatPulldown, 'Puxada Frontal', MuscleGroup.back),
+          _SuggestedExercise(loc.exBentOverRow, 'Remada Curvada', MuscleGroup.back),
+          _SuggestedExercise(loc.exBicepCurl, 'Rosca Direta', MuscleGroup.biceps),
+          _SuggestedExercise(loc.exHammerCurl, 'Rosca Martelo', MuscleGroup.biceps),
         ],
       ),
     ];
-    return _buildSuggestionList(context, ref, suggestions);
+    return _buildSuggestionList(context, ref, suggestions, loc);
   }
 
   Widget _buildWomenSuggestions(BuildContext context, WidgetRef ref) {
+    final loc = AppLocalizations.of(context)!;
     final suggestions = [
       _Suggestion(
-        name: 'Foco Glúteos e Quadríceps',
-        description: 'Treino inferior completo com ênfase em glúteos.',
+        name: loc.suggestGlutesQuads,
+        description: loc.suggestGlutesQuadsDesc,
         exercises: [
-          _SuggestedExercise('Agachamento Livre', MuscleGroup.legs),
-          _SuggestedExercise('Elevação Pélvica', MuscleGroup.legs),
-          _SuggestedExercise('Leg Press', MuscleGroup.legs),
-          _SuggestedExercise('Cadeira Extensora', MuscleGroup.legs),
-          _SuggestedExercise('Cadeira Abdutora', MuscleGroup.legs),
+          _SuggestedExercise(loc.exSquat, 'Agachamento Livre', MuscleGroup.legs),
+          _SuggestedExercise(loc.exHipThrust, 'Elevação Pélvica', MuscleGroup.legs),
+          _SuggestedExercise(loc.exLegPress, 'Leg Press', MuscleGroup.legs),
+          _SuggestedExercise(loc.exLegExtension, 'Cadeira Extensora', MuscleGroup.legs),
+          _SuggestedExercise(loc.exLegAbduction, 'Cadeira Abdutora', MuscleGroup.legs),
         ],
       ),
       _Suggestion(
-        name: 'Posterior e Superiores',
-        description: 'Treino de membros superiores com foco no core.',
+        name: loc.suggestHamstringsUpper,
+        description: loc.suggestHamstringsUpperDesc,
         exercises: [
-          _SuggestedExercise('Cadeira Flexora', MuscleGroup.legs),
-          _SuggestedExercise('Stiff', MuscleGroup.legs),
-          _SuggestedExercise('Puxada Frontal', MuscleGroup.back),
-          _SuggestedExercise('Elevação Lateral', MuscleGroup.shoulders),
-          _SuggestedExercise('Abdominal Supra', MuscleGroup.core),
+          _SuggestedExercise(loc.exLegCurl, 'Cadeira Flexora', MuscleGroup.legs),
+          _SuggestedExercise(loc.exStiff, 'Stiff', MuscleGroup.legs),
+          _SuggestedExercise(loc.exLatPulldown, 'Puxada Frontal', MuscleGroup.back),
+          _SuggestedExercise(loc.exLateralRaise, 'Elevação Lateral', MuscleGroup.shoulders),
+          _SuggestedExercise(loc.exCrunch, 'Abdominal Supra', MuscleGroup.core),
         ],
       ),
     ];
-    return _buildSuggestionList(context, ref, suggestions);
+    return _buildSuggestionList(context, ref, suggestions, loc);
   }
 
-  Widget _buildSuggestionList(BuildContext context, WidgetRef ref, List<_Suggestion> suggestions) {
+  Widget _buildSuggestionList(BuildContext context, WidgetRef ref, List<_Suggestion> suggestions, AppLocalizations loc) {
     return ListView.builder(
       padding: const EdgeInsets.all(16),
       itemCount: suggestions.length,
@@ -104,14 +108,14 @@ class SuggestionsScreen extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(sug.description, style: const TextStyle(color: Colors.grey)),
                 const SizedBox(height: 12),
-                const Text('Exercícios:', style: TextStyle(fontWeight: FontWeight.bold)),
-                ...sug.exercises.map((e) => Text('• ${e.name} (${e.muscleGroup.name.toUpperCase()})')).toList(),
+                Text(loc.exercisesLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
+                ...sug.exercises.map((e) => Text('• ${e.displayName} (${e.muscleGroup.name.toUpperCase()})')).toList(),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     icon: const Icon(Icons.add_circle_outline),
-                    label: const Text('ADICIONAR À MINHA ROTINA'),
+                    label: Text(loc.addToMyRoutineUpper),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
@@ -134,12 +138,12 @@ class SuggestionsScreen extends ConsumerWidget {
     final allDbExercises = await repo.getAllExercises();
     
     for (final ex in sug.exercises) {
-      final existingMatches = allDbExercises.where((dbEx) => dbEx.name.toLowerCase() == ex.name.toLowerCase()).toList();
+      final existingMatches = allDbExercises.where((dbEx) => dbEx.name.toLowerCase() == ex.dbName.toLowerCase()).toList();
       if (existingMatches.isNotEmpty) {
         resolvedExercises.add(existingMatches.first);
       } else {
         final newEx = Exercise()
-          ..name = ex.name
+          ..name = ex.dbName
           ..muscleGroup = ex.muscleGroup
           ..isCustom = false;
         await repo.saveExercise(newEx);
@@ -158,8 +162,9 @@ class SuggestionsScreen extends ConsumerWidget {
     ref.invalidate(exercisesProvider);
 
     if (context.mounted) {
+      final loc = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Treino importado! Vá na aba Treinos para configurá-lo.')),
+        SnackBar(content: Text(loc.routineImported)),
       );
     }
   }
@@ -173,7 +178,8 @@ class _Suggestion {
 }
 
 class _SuggestedExercise {
-  final String name;
+  final String displayName;
+  final String dbName;
   final MuscleGroup muscleGroup;
-  _SuggestedExercise(this.name, this.muscleGroup);
+  _SuggestedExercise(this.displayName, this.dbName, this.muscleGroup);
 }

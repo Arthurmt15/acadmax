@@ -5,8 +5,9 @@ import 'features/workout/presentation/providers/workout_providers.dart';
 import 'features/workout/data/workout_repository.dart';
 import 'core/database/database.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:gym_tracker/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -33,6 +34,16 @@ class GymTrackerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Gym Tracker',
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('pt', ''),
+        Locale('en', ''),
+      ],
       debugShowCheckedModeBanner: false,
       scrollBehavior: const MaterialScrollBehavior().copyWith(
         dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.stylus, PointerDeviceKind.unknown},

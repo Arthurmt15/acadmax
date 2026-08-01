@@ -22,3 +22,16 @@ subprojects {
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
+
+subprojects {
+    afterEvaluate {
+        project.extensions.findByName("android")?.let { ext ->
+            try {
+                ext.javaClass.getMethod("setCompileSdk", Int::class.java).invoke(ext, 35)
+            } catch (e: Exception) { }
+            try {
+                ext.javaClass.getMethod("compileSdkVersion", Int::class.java).invoke(ext, 35)
+            } catch (e: Exception) { }
+        }
+    }
+}

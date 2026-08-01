@@ -16,14 +16,6 @@ subprojects {
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
 subprojects {
-    project.evaluationDependsOn(":app")
-}
-
-tasks.register<Delete>("clean") {
-    delete(rootProject.layout.buildDirectory)
-}
-
-subprojects {
     afterEvaluate {
         project.extensions.findByName("android")?.let { ext ->
             try {
@@ -34,4 +26,11 @@ subprojects {
             } catch (e: Exception) { }
         }
     }
+}
+subprojects {
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register<Delete>("clean") {
+    delete(rootProject.layout.buildDirectory)
 }

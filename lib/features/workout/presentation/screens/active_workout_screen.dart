@@ -20,21 +20,23 @@ class ActiveWorkoutScreen extends StatelessWidget {
           )
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: const [
-          ExerciseCard(
-            exerciseName: 'Supino Reto',
-            lastWorkoutWeight: 60.0,
-            lastWorkoutReps: 10,
-          ),
-          SizedBox(height: 16),
-          ExerciseCard(
-            exerciseName: 'Crucifixo com Halteres',
-            lastWorkoutWeight: 18.0,
-            lastWorkoutReps: 12,
-          ),
-        ],
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: const [
+            ExerciseCard(
+              exerciseName: 'Supino Reto',
+              lastWorkoutWeight: 60.0,
+              lastWorkoutReps: 10,
+            ),
+            SizedBox(height: 16),
+            ExerciseCard(
+              exerciseName: 'Crucifixo com Halteres',
+              lastWorkoutWeight: 18.0,
+              lastWorkoutReps: 12,
+            ),
+          ],
+        ),
       ),
     );
   }

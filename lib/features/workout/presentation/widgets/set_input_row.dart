@@ -32,7 +32,7 @@ class SetInputRow extends StatelessWidget {
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.grey.shade100,
+                  fillColor: const Color(0xFF27272A),
                   contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                 ),
@@ -48,7 +48,7 @@ class SetInputRow extends StatelessWidget {
                 textAlign: TextAlign.center,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.grey.shade100,
+                  fillColor: const Color(0xFF27272A),
                   contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                 ),

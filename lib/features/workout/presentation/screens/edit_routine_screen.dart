@@ -203,32 +203,25 @@ class _EditRoutineScreenState extends ConsumerState<EditRoutineScreen> {
               onChanged: (val) => setState(() => _searchQuery = val),
             ),
             const SizedBox(height: 8),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: FilterChip(
-                      label: const Text('Todos'),
-                      selected: _selectedFilter == null,
-                      selectedColor: Theme.of(context).colorScheme.primary,
-                      onSelected: (_) => setState(() => _selectedFilter = null),
-                    ),
-                  ),
-                  ...MuscleGroup.values.map((mg) {
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: FilterChip(
-                        label: Text(mg.name),
-                        selected: _selectedFilter == mg,
-                        selectedColor: Theme.of(context).colorScheme.primary,
-                        onSelected: (_) => setState(() => _selectedFilter = mg),
-                      ),
-                    );
-                  }).toList(),
-                ],
-              ),
+            Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              children: [
+                FilterChip(
+                  label: const Text('Todos'),
+                  selected: _selectedFilter == null,
+                  selectedColor: Theme.of(context).colorScheme.primary,
+                  onSelected: (_) => setState(() => _selectedFilter = null),
+                ),
+                ...MuscleGroup.values.map((mg) {
+                  return FilterChip(
+                    label: Text(mg.name),
+                    selected: _selectedFilter == mg,
+                    selectedColor: Theme.of(context).colorScheme.primary,
+                    onSelected: (_) => setState(() => _selectedFilter = mg),
+                  );
+                }).toList(),
+              ],
             ),
             const SizedBox(height: 16),
             exercisesAsync.when(
